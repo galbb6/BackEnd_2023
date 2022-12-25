@@ -435,7 +435,7 @@ public class DBservices
 
         cmd.Parameters.AddWithValue("@StartDate", vacation.StartDate);
 
-        cmd.Parameters.AddWithValue("@UserId", vacation.UserId);
+        cmd.Parameters.AddWithValue("@email", vacation.email);
 
         cmd.Parameters.AddWithValue("@FlatId", vacation.FlatId);
 
@@ -510,7 +510,7 @@ public class DBservices
 
         cmd.Parameters.AddWithValue("@StartDate", vacation.StartDate);
 
-        cmd.Parameters.AddWithValue("@UserId", vacation.UserId);
+        cmd.Parameters.AddWithValue("@email", vacation.email);
 
         cmd.Parameters.AddWithValue("@FlatId", vacation.FlatId);
 
@@ -548,7 +548,7 @@ public class DBservices
             {
                 Vacation v = new Vacation();
                 v.id = Convert.ToInt32(dataReader["id"]);
-                v.UserId = Convert.ToInt32(dataReader["UserId"]);
+                v.email = Convert.ToString(dataReader["email"]);
                 v.FlatId = Convert.ToInt32(dataReader["FlatId"]);
                 v.StartDate = Convert.ToDateTime(dataReader["StartDate"]);
                 v.EndDate = Convert.ToDateTime(dataReader["EndDate"]);
@@ -882,7 +882,7 @@ public class DBservices
 
 
 
-    public int DeleteUserProfile(string email, int userId)
+    public int DeleteUserProfile(string email)
     {
 
         SqlConnection con;
@@ -900,7 +900,7 @@ public class DBservices
 
         //String cStr = BuildUpdateCommand(student);      // helper method to build the insert string
 
-        cmd = CreateCommandWithStoredProcedureDeleteUser("spDeleteUser", con, email, userId);             // create the command
+        cmd = CreateCommandWithStoredProcedureDeleteUser("spDeleteUser", con, email);             // create the command
 
         try
         {
@@ -925,7 +925,7 @@ public class DBservices
     }
 
 
-    private SqlCommand CreateCommandWithStoredProcedureDeleteUser(String spName, SqlConnection con, string email, int userId)
+    private SqlCommand CreateCommandWithStoredProcedureDeleteUser(String spName, SqlConnection con, string email)
     {
 
         SqlCommand cmd = new SqlCommand(); // create the command object
@@ -940,7 +940,6 @@ public class DBservices
 
         cmd.Parameters.AddWithValue("@email", email);
 
-        cmd.Parameters.AddWithValue("@userId", userId);
         return cmd;
     }
 

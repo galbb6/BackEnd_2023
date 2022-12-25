@@ -16,7 +16,7 @@ namespace AirBnb_Part_2.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // GET: api/<VixationController>
-        [HttpGet("getAllVications")]
+        [HttpGet]
         public List<Vacation> Get()
         {
             return Vacation.Read();
@@ -26,7 +26,7 @@ namespace AirBnb_Part_2.Controllers
         //--------------------------------------------------------------------------------------------------
         // GET api/<VixationController>/5
 
-        [HttpGet("GetVacationByID/id/{id}")]
+        [HttpGet("id/{id}")]
         public Vacation Get(int id)
         {
 
@@ -44,7 +44,7 @@ namespace AirBnb_Part_2.Controllers
         //--------------------------------------------------------------------------------------------------
         // # GET VACATION BY DATES                               
         //--------------------------------------------------------------------------------------------------
-        [HttpGet("getByDates/startDate/{startDate}/endDate/{endDate}")]
+        [HttpGet("startDate/{startDate}/endDate/{endDate}")]
         public List<Vacation> getByDates(DateTime startDate, DateTime endDate)
         {
             List<Vacation> VList = Vacation.getByDatesOrders(startDate, endDate);
@@ -63,7 +63,7 @@ namespace AirBnb_Part_2.Controllers
         // # INSERT VACATION                               
         //--------------------------------------------------------------------------------------------------
         // POST api/<VixationController>
-        [HttpPost("Insert Vacation")]
+        [HttpPost]
         public bool Post([FromBody] Vacation V)
 
         {
@@ -82,7 +82,7 @@ namespace AirBnb_Part_2.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // PUT api/<VixationController>/5
-        [HttpPut("Update Vication")]
+        [HttpPut("id/{id}")]
         public IActionResult Put(int id, [FromBody] Vacation vacation)
         {
             vacation.id = id;
@@ -105,7 +105,7 @@ namespace AirBnb_Part_2.Controllers
         // # DELETE VACATION                               
         //--------------------------------------------------------------------------------------------------
         // DELETE api/<VixationController>/5
-        [HttpDelete("Delete Vacation/id/{id}")]
+        [HttpDelete("id/{id}")]
         public bool Delete(int id)
         {
             Vacation v = new Vacation();

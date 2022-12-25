@@ -5,7 +5,7 @@
 
        
         public int id { get; set; }
-        public int UserId { get; set; }
+        public string email { get; set; }
         public int FlatId { get; set; }
         public DateTime StartDate { get ; set; }
         public DateTime EndDate { get; set; }

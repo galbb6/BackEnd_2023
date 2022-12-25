@@ -19,7 +19,7 @@ namespace AirBnb_Part_2.Controllers
         // # GET ALL USERS                                
         //--------------------------------------------------------------------------------------------------
         // GET: api/<UserController>
-        [HttpGet("Get All Users")]
+        [HttpGet]
         public List<UserProfile> Get()
         {
 
@@ -31,7 +31,7 @@ namespace AirBnb_Part_2.Controllers
         //--------------------------------------------------------------------------------------------------
 
         // GET api/<UserController>/5
-        [HttpGet("Get User/email/{email}/password/{password}")]
+        [HttpGet("email/{email}/password/{password}")]
         public UserProfile GetUser(string email, string password)
         {
 
@@ -52,7 +52,7 @@ namespace AirBnb_Part_2.Controllers
         // # INSERT USER                                
         //--------------------------------------------------------------------------------------------------
         // POST api/<UserController>
-        [HttpPost("Insert User")]
+        [HttpPost]
         public bool Post([FromBody] UserProfile profile)
         {
 
@@ -68,7 +68,7 @@ namespace AirBnb_Part_2.Controllers
         // # UPDATE USER                                
         //--------------------------------------------------------------------------------------------------
         // PUT api/<UserController>/5
-        [HttpPut("Update User")]
+        [HttpPut]
         public bool Put( [FromBody] UserProfile user)
         {
                         
@@ -88,11 +88,11 @@ namespace AirBnb_Part_2.Controllers
         // # DELETE USER                                
         //--------------------------------------------------------------------------------------------------
         // DELETE api/<UserController>/5
-        [HttpDelete("Delete User/email/{email}/userId/{userId}")]
-        public bool Delete(string email, int userId)
+        [HttpDelete("{email}")]
+        public bool Delete(string email)
         {
            
-            int temp = UserProfile.DeleteUserProfile(email,userId);
+            int temp = UserProfile.DeleteUserProfile(email);
             if (temp > 0)
             {
                 return true;

@@ -31,7 +31,24 @@
       //--------------------------------------------------------------------------------------------------
 
       $(document).ready(function () {
+        if (
+          location.hostname === "localhost" ||
+          location.hostname === "127.0.0.1"
+        ) {
+          apiFlat = "https://localhost:7001/api/Flat";
+        } else {
+          apiFlat = "https://proj.ruppin.ac.il/cgroup33/test2/tar1/api/Flat";
+        }
         GetAllFlats();
+        if (
+          location.hostname === "localhost" ||
+          location.hostname === "127.0.0.1"
+        ) {
+          apiUser = "https://localhost:7001/api/User";
+        } else {
+          apiUser = "https://proj.ruppin.ac.il/cgroup33/test2/tar1/api/User";
+        }
+
         if (
           sessionStorage.getItem("Login") == null ||
           sessionStorage.getItem("Login") == undefined
@@ -63,14 +80,6 @@
       // # GET FLATS
       //--------------------------------------------------------------------------------------------------
       function GetAllFlats() {
-        // if (location.hostname === "localhost" || location.hostname === "127.0.0.1"){
-        //   apiFlat = "https://localhost:7001/api/Flat/Get All Flats";
-        // } else {
-        //   apiFlat = "http://proj.ruppin.ac.il/cgroup33/test2/tar1/swagger/index.html";
-
-        // }
-        apiFlat = "https://localhost:7001/api/Flat/Get All Flats";
-
         ajaxCall("GET", apiFlat, "", GetAllFlatsSCB, GetAllFlatsECB);
       }
       //succeed to render the flats
@@ -139,7 +148,6 @@
           Price: price,
           NumOfRooms: roomNum,
         };
-        apiFlat = "https://localhost:7001/api/Flat/Insert Flat";
 
         ajaxCall(
           "POST",
@@ -239,7 +247,6 @@
           Price: price,
           NumOfRooms: roomNum,
         };
-        apiFlat = "https://localhost:7001/api/Flat/Update Flat";
 
         ajaxCall(
           "PUT",
@@ -268,21 +275,11 @@
       //--------------------------------------------------------------------------------------------------
       //delete flat from DB
       function DeleteFlat(flatId) {
-        if (confirm("Are you sure you want to delete this flat?")==true) {
-           apiFlat =
-          "https://localhost:7001/api/Flat/Delete Flat/flatId/" +
-          JSON.stringify(flatId) +
-          "";
-
-        ajaxCall(
-          "DELETE",
-          apiFlat,
-          JSON.stringify(flatId),
-          DeleteFlatSCB,
-          DeleteFlatECB
-        );
-        } else{window.location.reload()}
-       
+        if (confirm("Are you sure you want to delete this flat?") == true) {
+          ajaxCall("DELETE", apiFlat, flatId, DeleteFlatSCB, DeleteFlatECB);
+        } else {
+          window.location.reload();
+        }
       }
       //succeed delete flat
       function DeleteFlatSCB(data) {
@@ -351,15 +348,16 @@
       }
       //get account from DB
       function SingInToDB() {
-        var Email = $("#defaultForm-email").val();
+        var email = $("#defaultForm-email").val();
         var Pass = $("#defaultForm-pass").val();
-        apiFlat =
-          "https://localhost:7001/api/User/Get User/email/" +
-          Email +
-          "/password/" +
-          Pass +
-          "";
-        ajaxCall("GET", apiFlat, "", getAccessSCB, getAccessECB);
+
+        ajaxCall(
+          "GET",
+          apiUser,
+          JSON.stringify(email, Pass),
+          getAccessSCB,
+          getAccessECB
+        );
       }
       //succeed to get access
       function getAccessSCB(data) {
@@ -368,9 +366,18 @@
           $("#defaultForm-email").val("");
           $("#defaultForm-pass").val("");
         } else {
+          var email = $("#defaultForm-email").val();
+          data.forEach((element) => {
+            if (element.email == email) {
+              sessionStorage.setItem("Login", element.email);
+              sessionStorage.setItem("userId", element.userId);
+              sessionStorage.setItem("userName", element.firstName);
+              sessionStorage.setItem("userFamily", element.familyName);
+              sessionStorage.setItem("userPass", element.UserPassword);
+            }
+          });
+
           alert("Login was successful");
-          sessionStorage.setItem("Login", data.email);
-          sessionStorage.setItem("userId",data.userId);
           window.location.reload();
         }
       }
@@ -424,7 +431,7 @@
         strSingUp +=
           ' <label data-error="wrong" data-success="right" for="defaultForm-pass">password</label>';
         strSingUp +=
-          '<input type="password" id="defaultForm-pass" class="form-control validate" required minlength="6" min="1" placeholder=" * * * * * *"/>';
+          '<input type="password" id="defaultForm-pass" class="form-control validate" required minlength="6"  placeholder=" * * * * * *"/>';
         strSingUp += "</div>";
         strSingUp += "</div>";
         strSingUp += '<div class="modal-footer d-flex justify-content-center">';
@@ -451,11 +458,10 @@
           email: Email,
           UserPassword: Pass,
         };
-        apiFlat = "https://localhost:7001/api/User/Insert User";
 
         ajaxCall(
           "POST",
-          apiFlat,
+          apiUser,
           JSON.stringify(user),
           postNewUserSCB,
           postNewUserECB
@@ -463,9 +469,16 @@
       }
       //succees sing up
       function postNewUserSCB(data) {
-        alert("Secceed");
+        alert("Succeed");
         var userEmail = $("#defaultForm-email").val();
+        var userName = $("#orangeForm-name").val();
+        var userFamily = $("#orangeForm-lastName").val();
+        var userPass = $("#defaultForm-pass").val();
+
         sessionStorage.setItem("Login", userEmail);
+        sessionStorage.setItem("userName", userName);
+        sessionStorage.setItem("userFamily", userFamily);
+        sessionStorage.setItem("userPass", userPass);
         window.location.reload();
       }
       //not success sing up
@@ -476,7 +489,7 @@
         $("#defaultForm-email").val("");
         $("#defaultForm-pass").val("");
       }
-    
+
       //--------------------------------------------------------------------------------------------------
       // # EDIT USER PROFILE
       //--------------------------------------------------------------------------------------------------
@@ -497,11 +510,10 @@
           email: Email,
           UserPassword: Pass,
         };
-        apiFlat = "https://localhost:7001/api/User/Update User";
 
         ajaxCall(
           "PUT",
-          apiFlat,
+          apiUser,
           JSON.stringify(user),
           updateUserSCB,
           updateUserECB
@@ -510,18 +522,32 @@
       //succeed edit profile
       function updateUserSCB(data) {
         alert("user " + sessionStorage.getItem("Login") + " update secceed");
+        var userName = $("#orangeForm-name").val();
+        var userFamily = $("#orangeForm-lastName").val();
+        var userPass = $("#defaultForm-pass").val();
+
+        sessionStorage.setItem("userName", userName);
+        sessionStorage.setItem("userFamily", userFamily);
+        sessionStorage.setItem("userPass", userPass);
         window.location.reload();
       }
       //not succeed edit profile
       function updateUserECB(error) {
         alert("user update failed");
-        $("#orangeForm-name").val("");
-        $("#orangeForm-lastName").val("");
-        $("#defaultForm-pass").val("");
+        var userName=sessionStorage.getItem("userName");
+        var userFamiliy=sessionStorage.getItem("userFamily");
+        var userPass=sessionStorage.getItem("userPass");
+        
+        $("#orangeForm-name").val(userName);
+        $("#orangeForm-lastName").val(userFamiliy);
+        $("#defaultForm-pass").val(userPass);
       }
       // edit user profile modal
       function editProfile() {
         sessionStorage.setItem("UserNextStep", "Edit");
+        var userName=sessionStorage.getItem("userName");
+        var userFamiliy=sessionStorage.getItem("userFamily");
+        var userPass=sessionStorage.getItem("userPass");
         document.getElementById("renderModal").innerHTML = "";
         var strEdit = "";
         strEdit += '<div class="modal-header text-center">';
@@ -538,21 +564,21 @@
         strEdit +=
           '<label data-error="wrong" data-success="right" for="orangeForm-name">first name</label>';
         strEdit +=
-          '<input type="text" id="orangeForm-name" class="form-control validate" required placeholder="first name">';
+          '<input type="text" id="orangeForm-name" class="form-control validate" required value="'+userName+'">';
         strEdit += "</div>";
         strEdit += '<div class="md-form mb-5">';
         strEdit += '<i class="fas fa-user prefix grey-text"></i>';
         strEdit +=
           '<label data-error="wrong" data-success="right" for="orangeForm-name">last name</label>';
         strEdit +=
-          '<input type="text" id="orangeForm-lastName" class="form-control validate" required placeholder="last name">';
+          '<input type="text" id="orangeForm-lastName" class="form-control validate" required value="'+userFamiliy+'">';
         strEdit += "</div>";
         strEdit += ' <div class="md-form mb-4">';
         strEdit += '<i class="fas fa-lock prefix grey-text"></i>';
         strEdit +=
           ' <label data-error="wrong" data-success="right" for="defaultForm-pass">password</label>';
         strEdit +=
-          '<input type="password" id="defaultForm-pass" class="form-control validate" required minlength="6" placeholder=" * * * * * *"/>';
+          '<input type="password" id="defaultForm-pass" class="form-control validate" required minlength="6" value="'+userPass+'">';
         strEdit += "</div>";
         strEdit += "</div>";
         strEdit += '<div class="modal-footer d-flex justify-content-center">';
@@ -576,19 +602,13 @@
       //--------------------------------------------------------------------------------------------------
       //Delete user from DB
       function DeleteUser() {
-        if( confirm("Are you sure you want to delete?")==true){
-var email = sessionStorage.getItem("Login");
-        apiFlat =
-          "https://localhost:7001/api/User/Delete User/email/" + email + "";
-        ajaxCall(
-          "DELETE",
-          apiFlat,
-          JSON.stringify(email),
-          DeleteUserSCB,
-          DeleteUserECB
-        );
-        } else{window.location.reload()}
-        
+        if (confirm("Are you sure you want to delete?") == true) {
+          var email = sessionStorage.getItem("Login");
+
+          ajaxCall("DELETE", apiUser, email, DeleteUserSCB, DeleteUserECB);
+        } else {
+          window.location.reload();
+        }
       }
       //succeed delete user
       function DeleteUserSCB(data) {
@@ -607,6 +627,7 @@ var email = sessionStorage.getItem("Login");
       function navbarSelect() {
         var strLogin = "";
         if (sessionStorage.getItem("Login") != "false") {
+          
           strLogin += "<ul>";
           strLogin += "<li>";
           strLogin +=
@@ -621,6 +642,7 @@ var email = sessionStorage.getItem("Login");
             '<a href="" id="BtnLogOut" onclick="Logout()" class="btn btn-default btn-rounded mb-4" data-toggle="modal" data-target="#modalLoginForm">Log out</a>';
           strLogin += "</li>";
           strLogin += "</ul>";
+
         } else {
           strLogin += "<ul>";
           strLogin += "<li>";
@@ -640,6 +662,7 @@ var email = sessionStorage.getItem("Login");
   <body>
     <div id="container" class="row col-12">
       <div id="nav">
+        <div id="logEmail"></div>
         <div id="navLogin"></div>
         <form id="loginModal">
           <div
@@ -657,7 +680,7 @@ var email = sessionStorage.getItem("Login");
 
           <div id="loginDiv" class="text-center"></div>
         </form>
-      
+
         <h2 id="headerF">Flats</h2>
         <h4>add a new flat</h4>
       </div>
